@@ -1,0 +1,15 @@
+{
+  "name": "exercise4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "createCity.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^4.1.3",
+    "mongoose": "^6.0.12"
+  }
+}
