@@ -7,12 +7,12 @@ const connection = mysql.createConnection({
 });
 
 const createAuthorTable = `CREATE TABLE authors (
-  author_no INT NOT NULL AUTO_INCREMENT,
+  author_no INT NOT NULL,
   author_name VARCHAR(50),
   university VARCHAR(100),
   date_of_birth DATE,
   h_index INT,
-  gender VARCHAR(50),
+  gender ENUM ('F', 'M', 'Other'),
   PRIMARY KEY (author_no)
 );`;
 

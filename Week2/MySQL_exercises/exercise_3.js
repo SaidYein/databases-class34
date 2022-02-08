@@ -18,10 +18,13 @@ INNER JOIN authors author on author.author_no = mentor.mentor;`;
 
 //Write a query that prints all columns of authors and their published paper_title.
 //If there is an author without any research_Papers, print the information of that author too.
-const author_and_papers = `SELECT authors.*, research_Papers.paper_title
-FROM authors
-LEFT JOIN research_Papers 
-ON authors.author_no = research_Papers.author_id;`;
+
+const author_and_papers = `
+SELECT authors.*, research_Papers.paper_title
+FROM author_research
+LEFT JOIN authors ON author_research.author_no = authors.author_no
+LEFT JOIN research_Papers ON research_Papers.paper_id = author_research.paper_id;
+`;
 
 const queryArray = [authors_and_mentors, author_and_papers];
 
@@ -32,10 +35,12 @@ const queryArray = [authors_and_mentors, author_and_papers];
     queryArray.forEach(async (query, count) => {
       const result = await execQuery(query);
 
+      console.log(`######################### `);
       console.log(`Answer for query ${count + 1} is: `);
+      console.log(`######################### `);
 
       for (i in result) {
-        console.log(result[i]);
+        console.table(result[i]);
       }
     });
   } catch (error) {

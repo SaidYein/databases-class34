@@ -11,36 +11,41 @@ const connection = mysql.createConnection({
 const execQuery = util.promisify(connection.query.bind(connection));
 
 //All research papers and the number of authors that wrote that paper.
-const no_authors = `SELECT COUNT(author_id) AS no_Authors, paper_title
+const no_authors = `SELECT COUNT(author_research.author_no) AS no_Authors, research_Papers.paper_title
 FROM research_Papers
-GROUP BY paper_title;`;
+JOIN author_research
+ON author_research.paper_id = research_Papers.paper_id
+GROUP BY research_Papers.paper_title;`;
 
 //Sum of the research papers published by all female authors.
 const no_female_publishers = `SELECT COUNT(paper_id) AS no_female_publishers 
-FROM research_papers 
+FROM author_research 
 INNER JOIN authors
-ON authors.author_no=research_papers.author_id 
-WHERE gender='female';`;
+ON authors.author_no=author_research.author_no
+WHERE authors.gender='F';`;
 
 //Average of the h-index of all authors per university.
 const av_h_index = `SELECT
-AVG(h_index) AS av_h_index,
-university
+AVG (h_index) AS av_h_index, university
 FROM authors
 GROUP BY university;`;
 
 //Sum of the research papers of the authors per university.
-const no_papers_by_uni = `SELECT university,count(*) AS no_papers
-FROM authors 
+const no_papers_by_uni = `SELECT authors.university,count(research_Papers.paper_title) AS no_papers
+FROM author_research 
 JOIN research_Papers  
-ON authors.author_no = research_Papers.author_id 
-GROUP by university;`;
+ON author_research.paper_id = research_Papers.paper_id 
+JOIN authors 
+ON author_research.author_no = authors.author_no
+GROUP by authors.university;`;
 
 //Minimum and maximum of the h-index of all authors per university.
-const max_min_h_index = `SELECT university, MIN(h_index),MAX(h_index)
-FROM authors 
-JOIN research_papers
-ON  authors.author_no=research_Papers.author_id 
+const max_min_h_index = `SELECT authors.university, MIN(authors.h_index),MAX(authors.h_index)
+FROM author_research 
+JOIN research_Papers  
+ON author_research.paper_id = research_Papers.paper_id 
+JOIN authors 
+ON author_research.author_no = authors.author_no
 GROUP BY university;`;
 
 const queryArray = [
@@ -57,10 +62,16 @@ const queryArray = [
   try {
     queryArray.forEach(async (query, count) => {
       const result = await execQuery(query);
+      console.log(
+        `########################################################################### `
+      );
       console.log(`Answer for query ${count + 1} is: `);
+      console.log(
+        `########################################################################### `
+      );
 
       for (i in result) {
-        console.log(result[i]);
+        console.table(result[i]);
       }
     });
   } catch (error) {
